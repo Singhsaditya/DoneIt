@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/authStore";
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -29,7 +30,7 @@ export default function Signup() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e)=>__signupHandler(e, formData, navigate)} className="space-y-4">
           <input
             type="text"
             placeholder="Full name"
@@ -90,3 +91,21 @@ export default function Signup() {
     </div>
   );
 }
+
+// AUTH LOGIC (Injected once)
+import { useAuthStore } from "@/stores/authStore";
+
+const __signupHandler = async (e, formData, navigate) => {
+  e.preventDefault();
+  await useAuthStore.getState().signup(formData);
+  navigate("/");
+};
+
+// AUTH LOGIC (Injected once)
+import { useAuthStore } from "@/stores/authStore";
+
+const __signupHandler = async (e, formData, navigate) => {
+  e.preventDefault();
+  await useAuthStore.getState().signup(formData);
+  navigate("/");
+};
