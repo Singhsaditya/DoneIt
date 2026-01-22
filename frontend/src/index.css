@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
+   BASE THEME VARIABLES
+================================ */
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 20%;
+    --primary: 142 71% 29%;
+    --primary-dark: 142 71% 24%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 142 20% 96%;
+    --border: 0 0% 88%;
+    --destructive: 0 84% 60%;
+  }
+
+  body {
+    position: relative;
+    overflow-x: hidden;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  /*
+    Static soft background blobs (NO animation)
+    - keeps visual depth
+    - zero runtime cost
+  */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: -40%;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(254, 243, 199, 0.35) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, rgba(254, 215, 170, 0.25) 0%, transparent 55%),
+      radial-gradient(ellipse at 40% 70%, rgba(187, 247, 208, 0.25) 0%, transparent 55%),
+      radial-gradient(ellipse at 70% 80%, rgba(229, 231, 235, 0.35) 0%, transparent 55%),
+      radial-gradient(ellipse at 90% 50%, rgba(199, 210, 254, 0.2) 0%, transparent 55%);
+    filter: blur(40px);
+    pointer-events: none;
+  }
+}
+
+/* ===============================
+   UTILITIES
+================================ */
+@layer utilities {
+  /* page enter animation (OPTIONAL, lightweight) */
+  .page-transition {
+    animation: fadeIn 0.25s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* glass styles */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .glass-card-strong {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .glass-primary {
+    background: rgba(21, 128, 61, 0.9);
+    backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* subtle lift (used sparingly) */
+  .hover-lift {
+    transition: transform 0.25s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-3px);
+  }
+}
