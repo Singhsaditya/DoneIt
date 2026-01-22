@@ -1,75 +1,67 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
 
 export default function Login() {
   const navigate = useNavigate();
+  const login = useAuthStore((s) => s.login);
+  const loading = useAuthStore((s) => s.loading);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // backend wiring later
-    navigate('/dashboard');
+    try {
+      await login(formData);
+      navigate("/dashboard");
+    } catch (err) {
+      alert(err?.response?.data?.message || "Login failed");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md glass-card-strong rounded-3xl p-10 shadow-xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome Back
-          </h1>
-          <p className="text-muted-foreground">
-            Sign in to continue
-          </p>
-        </div>
+      <div className="w-full max-w-md rounded-3xl p-10 shadow-xl bg-white/10 backdrop-blur-xl">
+        <h1 className="text-3xl font-bold text-center mb-6">Welcome Back</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
             placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border border-white/60
-                       focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
           />
 
           <input
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
             required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border border-white/60
-                       focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
           />
-
-          <div className="flex justify-end">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-primary hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </div>
 
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white
-                       py-3 rounded-xl font-semibold transition-all"
+            disabled={loading}
+            className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
           >
-            Login
+            {loading ? "Signing in..." : "Login"}
           </button>
         </form>
 
-        <p className="text-sm text-center mt-6 text-muted-foreground">
-          Don’t have an account?{' '}
-          <Link
-            to="/signup"
-            className="text-primary font-medium hover:underline"
-          >
+        <p className="text-sm text-center mt-6">
+          Don’t have an account?{" "}
+          <Link to="/signup" className="underline">
             Create account
           </Link>
         </p>

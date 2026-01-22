@@ -1,16 +1,16 @@
+const tasks = [];
 import { AlertTriangle, Clock, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { MOCK_TASKS } from '../lib/mockData';
 import { getPriorityColor, formatDate, getTimeRemaining } from '../lib/utils';
 
 export default function SLAMonitor() {
   const navigate = useNavigate();
   
-  const overdueTasks = MOCK_TASKS.filter(
+  const overdueTasks = [].filter(
     (t) => new Date(t.dueDate) < new Date() && t.status !== 'COMPLETED'
   );
   
-  const approachingDeadline = MOCK_TASKS.filter((t) => {
+  const approachingDeadline = [].filter((t) => {
     const daysUntilDue = Math.ceil((new Date(t.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
     return daysUntilDue <= 1 && daysUntilDue > 0 && t.status !== 'COMPLETED';
   });
@@ -49,7 +49,7 @@ export default function SLAMonitor() {
             <TrendingUp className="w-6 h-6 text-primary" />
           </div>
           <h3 className="text-2xl font-bold text-foreground mb-1">
-            {Math.round((MOCK_TASKS.filter(t => t.status === 'COMPLETED').length / MOCK_TASKS.length) * 100)}%
+            {Math.round(([].filter(t => t.status === 'COMPLETED').length / [].length) * 100)}%
           </h3>
           <p className="text-sm text-muted-foreground">Completion Rate</p>
         </div>

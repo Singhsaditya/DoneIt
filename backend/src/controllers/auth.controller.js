@@ -1,56 +1,72 @@
 import User from "../models/user.model.js";
+import AuditLog from "../models/audit.model.js";
 import generateToken from "../utils/generateToken.js";
 
 export const signup = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+  const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+  const existingUser = await User.findOne({
+    email: email.toLowerCase().trim(),
+  });
 
-    const exists = await User.findOne({ email });
-    if (exists) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    const user = await User.create({ name, email, password });
-
-    res.status(201).json({
-      token: generateToken(user._id),
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    console.error("SIGNUP ERROR:", error);
-    res.status(500).json({ message: error.message });
+  if (existingUser) {
+    return res.status(400).json({ message: "User already exists" });
   }
+
+  const user = await User.create({
+    name,
+    email: email.toLowerCase().trim(),
+    password,
+  });
+
+  await AuditLog.create({
+    user: user._id,
+    action: "USER_SIGNUP",
+  });
+
+  res.status(201).json({
+    token: generateToken(user._id),
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  });
 };
 
 export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select("+password");
-    if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+  const user = await User.findOne({
+    email: email.toLowerCase().trim(),
+  });
 
-    res.json({
-      token: generateToken(user._id),
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    console.error("LOGIN ERROR:", error);
-    res.status(500).json({ message: error.message });
+  if (!user || !(await user.matchPassword(password))) {
+    return res.status(401).json({ message: "Invalid credentials" });
   }
+
+  await AuditLog.create({
+    user: user._id,
+    action: "USER_LOGIN",
+  });
+
+  res.json({
+    token: generateToken(user._id),
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  });
+};
+
+export const getMe = async (req, res) => {
+  res.json({
+    id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+    role: req.user.role,
+  });
 };

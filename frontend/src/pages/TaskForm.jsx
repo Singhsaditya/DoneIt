@@ -1,202 +1,143 @@
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { MOCK_TASKS, MOCK_USERS_DATA, PRIORITY_OPTIONS } from '../lib/mockData';
-import { useToast } from '../hooks/use-toast';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { createTask, fetchTaskById, updateTask } from "../api/taskApi";
+import { fetchUsers } from "../api/userApi";
+import { useAuthStore } from "../stores/authStore";
 
 export default function TaskForm() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const isEdit = Boolean(id);
-  
-  const existingTask = isEdit ? MOCK_TASKS.find((t) => t.id === id) : null;
+  const navigate = useNavigate();
+
+  const user = useAuthStore((s) => s.user);
+
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(isEdit);
 
   const [formData, setFormData] = useState({
-    title: existingTask?.title || '',
-    description: existingTask?.description || '',
-    assigneeId: existingTask?.assignee.id || '',
-    priority: existingTask?.priority || 'MEDIUM',
-    dueDate: existingTask?.dueDate ? new Date(existingTask.dueDate).toISOString().split('T')[0] : '',
-    tags: existingTask?.tags.join(', ') || '',
+    title: "",
+    description: "",
+    assignedTo: "",
+    status: "todo",
   });
 
-  const [errors, setErrors] = useState({});
+  /* ===============================
+     FETCH USERS (ADMIN / MANAGER)
+  ================================ */
+  useEffect(() => {
+    if (user.role !== "employee") {
+      fetchUsers().then(setUsers);
+    }
+  }, [user.role]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!formData.assigneeId) newErrors.assigneeId = 'Assignee is required';
-    if (!formData.dueDate) newErrors.dueDate = 'Due date is required';
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  /* ===============================
+     FETCH TASK (EDIT MODE)
+  ================================ */
+  useEffect(() => {
+    if (!isEdit) return;
+
+    fetchTaskById(id)
+      .then((task) => {
+        setFormData({
+          title: task.title || "",
+          description: task.description || "",
+          assignedTo: task.assignedTo?._id || "",
+          status: task.status || "todo",
+        });
+      })
+      .finally(() => setLoading(false));
+  }, [id, isEdit]);
+
+  /* ===============================
+     HANDLERS
+  ================================ */
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
 
-    toast({
-      title: isEdit ? 'Task updated' : 'Task created',
-      description: isEdit 
-        ? 'Task has been updated successfully' 
-        : 'New task has been created successfully',
-    });
-    
-    navigate('/tasks');
+    if (isEdit) {
+      await updateTask(id, formData);
+    } else {
+      await createTask(formData);
+    }
+
+    navigate("/tasks");
   };
 
+  if (loading) return <p className="p-6">Loading...</p>;
+
+  /* ===============================
+     UI
+  ================================ */
   return (
-    <div className="page-transition">
-      <button
-        onClick={() => navigate('/tasks')}
-        className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-all"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Tasks
-      </button>
+    <div className="p-6 max-w-xl">
+      <h1 className="text-2xl font-bold mb-6">
+        {isEdit ? "Edit Task" : "Create Task"}
+      </h1>
 
-      <div className="max-w-3xl">
-        <h1 className="text-4xl font-bold text-foreground mb-6">
-          {isEdit ? 'Edit Task' : 'Create New Task'}
-        </h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* TITLE */}
+        <input
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="Task title"
+          className="w-full px-4 py-3 rounded-xl border"
+          required
+        />
 
-        <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl border border-border space-y-6">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-foreground mb-2">
-              Task Title *
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className={`w-full px-4 py-2.5 bg-background border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${
-                errors.title ? 'border-destructive' : 'border-border'
-              }`}
-              placeholder="Enter task title"
-            />
-            {errors.title && (
-              <p className="text-destructive text-xs mt-1">{errors.title}</p>
-            )}
-          </div>
+        {/* DESCRIPTION */}
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Task description"
+          className="w-full px-4 py-3 rounded-xl border"
+          rows={4}
+        />
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-foreground mb-2">
-              Description *
-            </label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className={`w-full px-4 py-2.5 bg-background border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none ${
-                errors.description ? 'border-destructive' : 'border-border'
-              }`}
-              rows={4}
-              placeholder="Describe the task"
-            />
-            {errors.description && (
-              <p className="text-destructive text-xs mt-1">{errors.description}</p>
-            )}
-          </div>
+        {/* STATUS */}
+        {isEdit && (
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-xl border"
+          >
+            <option value="todo">Todo</option>
+            <option value="in_progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="assignee" className="block text-sm font-medium text-foreground mb-2">
-                Assignee *
-              </label>
-              <select
-                id="assignee"
-                value={formData.assigneeId}
-                onChange={(e) => setFormData({ ...formData, assigneeId: e.target.value })}
-                className={`w-full px-4 py-2.5 bg-background border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${
-                  errors.assigneeId ? 'border-destructive' : 'border-border'
-                }`}
-              >
-                <option value="">Select assignee</option>
-                {MOCK_USERS_DATA.filter(u => u.status === 'active').map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name} ({user.role})
-                  </option>
-                ))}
-              </select>
-              {errors.assigneeId && (
-                <p className="text-destructive text-xs mt-1">{errors.assigneeId}</p>
-              )}
-            </div>
+        {/* ASSIGN TO */}
+        {user.role !== "employee" && (
+          <select
+            name="assignedTo"
+            value={formData.assignedTo}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-xl border"
+          >
+            <option value="">Assign to user</option>
+            {users.map((u) => (
+              <option key={u._id} value={u._id}>
+                {u.name} ({u.role})
+              </option>
+            ))}
+          </select>
+        )}
 
-            <div>
-              <label htmlFor="priority" className="block text-sm font-medium text-foreground mb-2">
-                Priority *
-              </label>
-              <select
-                id="priority"
-                value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              >
-                {PRIORITY_OPTIONS.map((priority) => (
-                  <option key={priority} value={priority}>
-                    {priority}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="dueDate" className="block text-sm font-medium text-foreground mb-2">
-                Due Date *
-              </label>
-              <input
-                id="dueDate"
-                type="date"
-                value={formData.dueDate}
-                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                className={`w-full px-4 py-2.5 bg-background border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${
-                  errors.dueDate ? 'border-destructive' : 'border-border'
-                }`}
-              />
-              {errors.dueDate && (
-                <p className="text-destructive text-xs mt-1">{errors.dueDate}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="tags" className="block text-sm font-medium text-foreground mb-2">
-                Tags (comma separated)
-              </label>
-              <input
-                id="tags"
-                type="text"
-                value={formData.tags}
-                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                placeholder="e.g., frontend, urgent"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 pt-4">
-            <button
-              type="submit"
-              className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-xl font-medium transition-all"
-            >
-              {isEdit ? 'Update Task' : 'Create Task'}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/tasks')}
-              className="bg-muted hover:bg-muted/70 text-foreground px-6 py-2.5 rounded-xl font-medium transition-all"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+        {/* SUBMIT */}
+        <button
+          type="submit"
+          className="bg-primary text-white px-6 py-3 rounded-xl"
+        >
+          {isEdit ? "Update Task" : "Create Task"}
+        </button>
+      </form>
     </div>
   );
 }

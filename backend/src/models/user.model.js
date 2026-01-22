@@ -9,13 +9,9 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
+      trim: true,
     },
-    password: {
-      type: String,
-      required: true,
-      minlength: 6,
-      select: false,
-    },
+    password: { type: String, required: true },
     role: {
       type: String,
       enum: ["admin", "manager", "employee"],
@@ -31,8 +27,8 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.matchPassword = async function (password) {
-  return bcrypt.compare(password, this.password);
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return bcrypt.compare(enteredPassword, this.password);
 };
 
 export default mongoose.model("User", userSchema);

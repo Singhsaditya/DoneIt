@@ -1,62 +1,59 @@
 import { create } from "zustand";
-import api from "../lib/api";
+import api from "../api/axios";
 
 export const useAuthStore = create((set) => ({
-  user: JSON.parse(localStorage.getItem("user")) || null,
-  token: localStorage.getItem("token") || null,
-  isAuthenticated: !!localStorage.getItem("token"),
-  loading: false,
-  error: null,
+  user: null,
+  token: null,
+  isAuthenticated: false,
 
-  signup: async (data) => {
-    try {
-      set({ loading: true, error: null });
-      const res = await api.post("/auth/signup", data);
+  hydrate: () => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
+    if (token && user) {
       set({
-        user: res.data.user,
-        token: res.data.token,
+        token,
+        user: JSON.parse(user),
         isAuthenticated: true,
-        loading: false,
       });
-    } catch (err) {
-      set({
-        error: err.response?.data?.message || "Signup failed",
-        loading: false,
-      });
-      throw err;
     }
+  },
+
+  setUser: (user) => {
+    localStorage.setItem("user", JSON.stringify(user));
+    set({ user, isAuthenticated: true });
   },
 
   login: async (data) => {
-    try {
-      set({ loading: true, error: null });
-      const res = await api.post("/auth/login", data);
+    const res = await api.post("/auth/login", data);
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+    set({
+      token: res.data.token,
+      user: res.data.user,
+      isAuthenticated: true,
+    });
+  },
 
-      set({
-        user: res.data.user,
-        token: res.data.token,
-        isAuthenticated: true,
-        loading: false,
-      });
-    } catch (err) {
-      set({
-        error: err.response?.data?.message || "Login failed",
-        loading: false,
-      });
-      throw err;
-    }
+  signup: async (data) => {
+    const res = await api.post("/auth/signup", data);
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
+    set({
+      token: res.data.token,
+      user: res.data.user,
+      isAuthenticated: true,
+    });
   },
 
   logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    set({ user: null, token: null, isAuthenticated: false });
+    localStorage.clear();
+    set({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+    });
   },
 }));

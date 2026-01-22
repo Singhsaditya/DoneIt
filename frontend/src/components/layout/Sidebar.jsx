@@ -73,7 +73,7 @@ export default function Sidebar() {
             <div className="absolute inset-2 border-2 border-white rounded-full" />
             <div className="absolute w-1.5 h-1.5 bg-white rounded-full" />
           </div>
-          <span className="text-xl font-bold text-foreground">Donezo</span>
+          <span className="text-xl font-bold text-foreground">DoneIt</span>
         </div>
       </div>
 

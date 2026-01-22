@@ -1,89 +1,81 @@
-import { useAuthStore } from "@/stores/authStore";
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
 
 export default function Signup() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+  const signup = useAuthStore((s) => s.signup);
+  const loading = useAuthStore((s) => s.loading);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) return;
-    // backend wiring later
-    navigate('/dashboard'); // auto-login flow
+    try {
+      await signup(formData);
+      navigate("/dashboard");
+    } catch (err) {
+      alert(err?.response?.data?.message || "Signup failed");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md glass-card-strong rounded-3xl p-10 shadow-xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-2">
-            Create Account
-          </h1>
-          <p className="text-muted-foreground">
-            Get started with DoneIt
-          </p>
-        </div>
+      <div className="w-full max-w-md rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl p-8">
+        <h2 className="text-2xl font-semibold text-center mb-6">
+          Create account
+        </h2>
 
-        <form onSubmit={(e)=>__signupHandler(e, formData, navigate)} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            type="text"
+            name="name"
             placeholder="Full name"
+            value={formData.name}
+            onChange={handleChange}
             required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border border-white/60
-                       focus:outline-none focus:ring-2 focus:ring-primary/30"
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
           />
 
           <input
+            name="email"
             type="email"
             placeholder="Email address"
+            value={formData.email}
+            onChange={handleChange}
             required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border border-white/60
-                       focus:outline-none focus:ring-2 focus:ring-primary/30"
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
           />
 
           <input
+            name="password"
             type="password"
             placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
             required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border border-white/60
-                       focus:outline-none focus:ring-2 focus:ring-primary/30"
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
-
-          <input
-            type="password"
-            placeholder="Confirm password"
-            required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border border-white/60
-                       focus:outline-none focus:ring-2 focus:ring-primary/30"
-            onChange={(e) =>
-              setForm({ ...form, confirmPassword: e.target.value })
-            }
+            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
           />
 
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-white
-                       py-3 rounded-xl font-semibold transition-all"
+            disabled={loading}
+            className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
           >
-            Sign up
+            {loading ? "Creating..." : "Sign up"}
           </button>
         </form>
 
-        <p className="text-sm text-center mt-6 text-muted-foreground">
-          Already have an account?{' '}
-          <Link
-            to="/login"
-            className="text-primary font-medium hover:underline"
-          >
+        <p className="text-sm text-center mt-6">
+          Already have an account?{" "}
+          <Link to="/login" className="underline">
             Login
           </Link>
         </p>
@@ -91,21 +83,3 @@ export default function Signup() {
     </div>
   );
 }
-
-// AUTH LOGIC (Injected once)
-import { useAuthStore } from "@/stores/authStore";
-
-const __signupHandler = async (e, formData, navigate) => {
-  e.preventDefault();
-  await useAuthStore.getState().signup(formData);
-  navigate("/");
-};
-
-// AUTH LOGIC (Injected once)
-import { useAuthStore } from "@/stores/authStore";
-
-const __signupHandler = async (e, formData, navigate) => {
-  e.preventDefault();
-  await useAuthStore.getState().signup(formData);
-  navigate("/");
-};

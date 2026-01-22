@@ -1,0 +1,199 @@
+✅ DoneIt — Enterprise Workflow Management System
+
+DoneIt is a role-based enterprise workflow management system built using the MERN stack.
+It is designed to manage tasks, users, and workflows across different organizational roles with proper authentication, authorization, and auditability.
+
+This project is built with real-world architecture principles, not as a demo or tutorial app.
+
+🚀 Features
+🔐 Authentication & Authorization
+
+JWT-based authentication
+
+Secure password hashing using bcrypt
+
+Persistent login across refresh
+
+Role-based access control (RBAC)
+
+Auto logout on token expiry
+
+👥 User Roles
+
+Admin
+
+Full system access
+
+User management
+
+Audit log access
+
+Manager
+
+Create & manage tasks
+
+View team tasks
+
+Employee
+
+View assigned tasks only
+
+🗂 Task Management
+
+Create, update, delete tasks (admin/manager)
+
+Role-aware task visibility
+
+Task status & priority tracking
+
+Secure backend enforcement (not just frontend)
+
+🔔 Notifications
+
+User-specific notifications
+
+Read/unread status
+
+Backend-persisted notifications
+
+📜 Audit Logs (Admin Only)
+
+User signup
+
+User login
+
+Task creation, update, deletion
+
+Centralized audit trail for accountability
+
+🧱 Tech Stack
+Frontend
+
+React + Vite
+
+Tailwind CSS
+
+Zustand (state management)
+
+Axios (API layer)
+
+React Router
+
+Backend
+
+Node.js
+
+Express.js
+
+MongoDB + Mongoose
+
+JWT Authentication
+
+bcrypt (password hashing)
+
+🏗 Architecture Overview
+Backend (MVC Pattern)
+backend/
+ ├── src/
+ │   ├── controllers/
+ │   ├── models/
+ │   ├── routes/
+ │   ├── middlewares/
+ │   └── utils/
+ ├── server.js
+
+Frontend
+frontend/
+ ├── src/
+ │   ├── pages/
+ │   ├── components/
+ │   ├── stores/
+ │   ├── api/
+ │   └── hooks/
+
+⚙️ Setup Instructions
+1️⃣ Clone Repository
+git clone https://github.com/Singhsaditya/DoneIt.git
+cd DoneIt
+
+2️⃣ Backend Setup
+cd backend
+npm install
+npm run dev
+
+
+Create a .env file in backend/:
+
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+PORT=5000
+
+3️⃣ Frontend Setup
+cd ../frontend
+npm install
+npm run dev
+
+
+Frontend runs on:
+
+http://localhost:8080
+
+
+Backend runs on:
+
+http://localhost:5000
+
+🔑 API Overview
+Auth
+
+POST /api/auth/signup
+
+POST /api/auth/login
+
+GET /api/auth/me
+
+Tasks
+
+GET /api/tasks
+
+POST /api/tasks (admin/manager)
+
+PUT /api/tasks/:id
+
+DELETE /api/tasks/:id (admin)
+
+Notifications
+
+GET /api/notifications
+
+PUT /api/notifications/:id/read
+
+Audit Logs
+
+GET /api/audit (admin only)
+
+🧠 Design Decisions
+
+Zustand chosen for lightweight, scalable state management
+
+Backend-enforced RBAC for real security
+
+Centralized error handling for production readiness
+
+Audit logs to simulate enterprise compliance needs
+
+📈 Future Improvements
+
+Real-time notifications (WebSockets)
+
+Task comments & attachments
+
+SLA breach alerts
+
+Team-based task grouping
+
+Refresh token rotation
+
+👨‍💻 Author
+
+Aditya Parmar
