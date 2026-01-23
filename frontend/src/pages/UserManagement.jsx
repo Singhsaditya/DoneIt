@@ -1,36 +1,87 @@
 import { useEffect, useState } from "react";
-import { fetchUsers } from "../api/userApi";
+import api from "../api/axios";
+import { useAuthStore } from "../stores/authStore";
 
 export default function UserManagement() {
+  const { user: currentUser } = useAuthStore();
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingId, setLoadingId] = useState(null);
 
   useEffect(() => {
-    fetchUsers()
-      .then(setUsers)
-      .finally(() => setLoading(false));
+    api.get("/users").then((res) => setUsers(res.data || []));
   }, []);
 
-  if (loading) return <p className="p-6">Loading users...</p>;
-  if (!users.length) return <p className="p-6">No users found</p>;
+  const updateRole = async (userId, role) => {
+    setLoadingId(userId);
+    try {
+      const res = await api.put(`/users/${userId}/role`, { role });
+      setUsers((prev) =>
+        prev.map((u) => (u._id === userId ? res.data : u))
+      );
+    } catch (err) {
+      alert(err?.response?.data?.message || "Failed to update role");
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   return (
-    <div className="p-6 space-y-4">
-      <h1 className="text-2xl font-bold">User Management</h1>
+    <div className="page-transition">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-foreground mb-2">
+          User Management
+        </h1>
+        <p className="text-muted-foreground">
+          Manage user roles and access
+        </p>
+      </div>
 
-      <div className="space-y-2">
-        {users.map((user) => (
-          <div
-            key={user._id}
-            className="p-4 rounded-xl border flex justify-between"
-          >
-            <div>
-              <p className="font-semibold">{user.name}</p>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-            </div>
-            <span className="text-sm capitalize">{user.role}</span>
-          </div>
-        ))}
+      <div className="bg-white rounded-2xl border overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/40">
+            <tr>
+              <th className="text-left px-6 py-4">Name</th>
+              <th className="text-left px-6 py-4">Email</th>
+              <th className="text-left px-6 py-4">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((u) => (
+              <tr key={u._id} className="border-t">
+                <td className="px-6 py-4 font-medium">{u.name}</td>
+                <td className="px-6 py-4 text-muted-foreground">
+                  {u.email}
+                </td>
+                <td className="px-6 py-4">
+                  {u._id === currentUser._id ? (
+                    <span className="text-muted-foreground">
+                      {u.role} (you)
+                    </span>
+                  ) : (
+                    <select
+                      value={u.role}
+                      disabled={loadingId === u._id}
+                      onChange={(e) =>
+                        updateRole(u._id, e.target.value)
+                      }
+                      className="border rounded-lg px-3 py-2"
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="manager">Manager</option>
+                      <option value="employee">Employee</option>
+                    </select>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {users.length === 0 && (
+          <p className="text-muted-foreground p-6">
+            No users found.
+          </p>
+        )}
       </div>
     </div>
   );

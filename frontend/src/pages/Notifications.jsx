@@ -27,6 +27,12 @@ export default function Notifications() {
         Mark all as read
       </button>
 
+          {notifications.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              You’re all caught up. No notifications yet.
+            </p>
+          )}
+
       {notifications.map((n) => (
         <div
           key={n._id}

@@ -1,141 +1,125 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createTask, fetchTaskById, updateTask } from "../api/taskApi";
-import { fetchUsers } from "../api/userApi";
-import { useAuthStore } from "../stores/authStore";
+import api from "../api/axios";
 
 export default function TaskForm() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
 
-  const user = useAuthStore((s) => s.user);
-
+  const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(isEdit);
 
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     title: "",
     description: "",
     assignedTo: "",
-    status: "todo",
+    priority: "Medium",
   });
 
   /* ===============================
-     FETCH USERS (ADMIN / MANAGER)
+     LOAD USERS
   ================================ */
   useEffect(() => {
-    if (user.role !== "employee") {
-      fetchUsers().then(setUsers);
+    async function loadUsers() {
+      const res = await api.get("/users");
+      setUsers(res.data);
     }
-  }, [user.role]);
+    loadUsers();
+  }, []);
 
   /* ===============================
-     FETCH TASK (EDIT MODE)
+     LOAD TASK (EDIT)
   ================================ */
   useEffect(() => {
     if (!isEdit) return;
 
-    fetchTaskById(id)
-      .then((task) => {
-        setFormData({
-          title: task.title || "",
-          description: task.description || "",
-          assignedTo: task.assignedTo?._id || "",
-          status: task.status || "todo",
-        });
-      })
-      .finally(() => setLoading(false));
+    async function loadTask() {
+      const res = await api.get(`/tasks/${id}`);
+      setForm({
+        title: res.data.title,
+        description: res.data.description,
+        assignedTo: res.data.assignedTo?._id || "",
+        priority: res.data.priority,
+      });
+    }
+
+    loadTask();
   }, [id, isEdit]);
 
   /* ===============================
-     HANDLERS
+     SUBMIT
   ================================ */
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    if (isEdit) {
-      await updateTask(id, formData);
-    } else {
-      await createTask(formData);
+    try {
+      if (isEdit) {
+        await api.put(`/tasks/${id}`, form);
+      } else {
+        await api.post("/tasks", form);
+      }
+      navigate("/tasks");
+    } catch (err) {
+      alert("Task save failed");
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/tasks");
   };
 
-  if (loading) return <p className="p-6">Loading...</p>;
-
-  /* ===============================
-     UI
-  ================================ */
   return (
     <div className="p-6 max-w-xl">
       <h1 className="text-2xl font-bold mb-6">
-        {isEdit ? "Edit Task" : "Create Task"}
+        {isEdit ? "Edit Task" : loading ? "Creating..." : "Create Task"}
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* TITLE */}
         <input
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          placeholder="Task title"
-          className="w-full px-4 py-3 rounded-xl border"
           required
+          placeholder="Title"
+          value={form.title}
+          onChange={(e) => setForm({ ...form, title: e.target.value })}
+          className="w-full p-3 border rounded-xl"
         />
 
-        {/* DESCRIPTION */}
         <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Task description"
-          className="w-full px-4 py-3 rounded-xl border"
-          rows={4}
+          placeholder="Description"
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          className="w-full p-3 border rounded-xl"
         />
 
-        {/* STATUS */}
-        {isEdit && (
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border"
-          >
-            <option value="todo">Todo</option>
-            <option value="in_progress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-        )}
+        <select
+          required
+          value={form.assignedTo}
+          onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
+          className="w-full p-3 border rounded-xl"
+        >
+          <option value="">Assign to</option>
+          {users.map((u) => (
+            <option key={u._id} value={u._id}>
+              {u.email}
+            </option>
+          ))}
+        </select>
 
-        {/* ASSIGN TO */}
-        {user.role !== "employee" && (
-          <select
-            name="assignedTo"
-            value={formData.assignedTo}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border"
-          >
-            <option value="">Assign to user</option>
-            {users.map((u) => (
-              <option key={u._id} value={u._id}>
-                {u.name} ({u.role})
-              </option>
-            ))}
-          </select>
-        )}
+        <select
+          value={form.priority}
+          onChange={(e) => setForm({ ...form, priority: e.target.value })}
+          className="w-full p-3 border rounded-xl"
+        >
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
 
-        {/* SUBMIT */}
         <button
           type="submit"
+          disabled={loading}
           className="bg-primary text-white px-6 py-3 rounded-xl"
         >
-          {isEdit ? "Update Task" : "Create Task"}
+          {isEdit ? "Update Task" : loading ? "Creating..." : "Create Task"}
         </button>
       </form>
     </div>

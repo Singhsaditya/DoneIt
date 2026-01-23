@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
 
 export default function Signup() {
@@ -13,12 +14,18 @@ export default function Signup() {
     password: "",
   });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
     try {
       await signup(formData);
       navigate("/dashboard");
@@ -29,47 +36,84 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl p-8">
-        <h2 className="text-2xl font-semibold text-center mb-6">
-          Create account
-        </h2>
+      <div className="w-full max-w-md rounded-3xl p-10 shadow-xl bg-white/10 backdrop-blur-xl">
+        <h1 className="text-3xl font-bold text-center mb-6">
+          Create Account
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            name="name"
+            type="text"
             placeholder="Full name"
             value={formData.name}
-            onChange={handleChange}
+            onChange={(e) =>
+              setFormData({ ...formData, name: e.target.value })
+            }
             required
             className="w-full px-4 py-3 rounded-xl bg-white/70 border"
           />
 
           <input
-            name="email"
             type="email"
             placeholder="Email address"
             value={formData.email}
-            onChange={handleChange}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             required
             className="w-full px-4 py-3 rounded-xl bg-white/70 border"
           />
 
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              required
+              className="w-full px-4 py-3 rounded-xl bg-white/70 border pr-12"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-xl bg-white/70 border pr-12"
+            />
+            <button
+              type="button"
+              onClick={() =>
+                setShowConfirmPassword(!showConfirmPassword)
+              }
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+            >
+              {showConfirmPassword ? (
+                <EyeOff size={18} />
+              ) : (
+                <Eye size={18} />
+              )}
+            </button>
+          </div>
 
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
           >
-            {loading ? "Creating..." : "Sign up"}
+            {loading ? "Creating account..." : "Sign Up"}
           </button>
         </form>
 

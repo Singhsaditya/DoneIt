@@ -49,6 +49,14 @@ export const useAuthStore = create((set) => ({
   },
 
   logout: () => {
+  updateUser: (updatedUser) => {
+    set((state) => {
+      const newUser = { ...state.user, ...updatedUser };
+      localStorage.setItem("auth", JSON.stringify({ token: state.token, user: newUser }));
+      return { user: newUser };
+    });
+  },
+
     localStorage.clear();
     set({
       user: null,

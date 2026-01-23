@@ -22,6 +22,8 @@ export default function Settings() {
 
     try {
       const updatedUser = await updateProfile(formData);
+      updateUser(updatedUser);
+
       setUser(updatedUser);
       alert("Profile updated successfully");
     } catch (err) {
@@ -56,7 +58,7 @@ export default function Settings() {
         />
 
         <button
-          type="submit"
+          type="submit" disabled={loading}
           disabled={loading}
           className="bg-primary text-white px-6 py-3 rounded-xl"
         >

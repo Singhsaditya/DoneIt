@@ -1,9 +1,20 @@
 import { useState } from 'react';
-import { Search, Bell, Mail, LogOut, ChevronDown } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Bell, LogOut, ChevronDown } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useNotificationStore } from '../../stores/notificationStore';
 import { formatRelativeTime } from '../../lib/utils';
+
+const getPageTitle = (pathname) => {
+  if (pathname.startsWith('/dashboard')) return 'Dashboard';
+  if (pathname.startsWith('/tasks')) return 'Tasks';
+  if (pathname.startsWith('/notifications')) return 'Notifications';
+  if (pathname.startsWith('/settings')) return 'Settings';
+  if (pathname.startsWith('/sla')) return 'SLA Monitor';
+  if (pathname.startsWith('/audit')) return 'Audit Logs';
+  if (pathname.startsWith('/users')) return 'User Management';
+  return 'DoneIt';
+};
 
 export default function TopBar({
   profileOpen,
@@ -12,43 +23,22 @@ export default function TopBar({
   profileRef,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthStore();
   const { notifications, unreadCount, markAsRead } = useNotificationStore();
 
-  const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      console.log('Search:', searchQuery);
-    }
-  };
 
   return (
     <header className="h-16 glass-card-strong border-b border-white/60 fixed top-0 left-64 right-0 z-20">
       <div className="h-full px-8 flex items-center justify-between">
-        {/* Search */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-xl relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search task"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-16 py-2.5 bg-white/40 border border-white/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-          />
-          <kbd className="absolute right-4 top-1/2 -translate-y-1/2 px-2 py-1 bg-white/60 border border-white/70 rounded text-xs text-muted-foreground">
-            ⌘F
-          </kbd>
-        </form>
+        {/* Page Title */}
+        <h2 className="text-base font-semibold text-foreground tracking-wide">
+          {getPageTitle(location.pathname)}
+        </h2>
 
         {/* Right Section */}
-        <div className="flex items-center gap-2 ml-6">
-          <button className="p-2 hover:bg-white/50 rounded-xl transition-all">
-            <Mail className="w-5 h-5 text-muted-foreground" />
-          </button>
-
+        <div className="flex items-center gap-2">
           {/* Notifications */}
           <div className="relative">
             <button
@@ -66,7 +56,9 @@ export default function TopBar({
             {showNotifications && (
               <div className="absolute right-0 top-full mt-2 w-80 glass-card-strong rounded-2xl border border-white/60 shadow-lg overflow-hidden">
                 <div className="p-4 border-b border-white/40">
-                  <h3 className="font-semibold text-foreground">Notifications</h3>
+                  <h3 className="font-semibold text-foreground">
+                    Notifications
+                  </h3>
                 </div>
 
                 <div className="max-h-96 overflow-y-auto divide-y divide-white/40">

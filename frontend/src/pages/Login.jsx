@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
 
 export default function Login() {
@@ -11,6 +12,8 @@ export default function Login() {
     email: "",
     password: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +28,9 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-md rounded-3xl p-10 shadow-xl bg-white/10 backdrop-blur-xl">
-        <h1 className="text-3xl font-bold text-center mb-6">Welcome Back</h1>
+        <h1 className="text-3xl font-bold text-center mb-6">
+          Welcome Back
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -39,16 +44,25 @@ export default function Login() {
             className="w-full px-4 py-3 rounded-xl bg-white/70 border"
           />
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              required
+              className="w-full px-4 py-3 rounded-xl bg-white/70 border pr-12"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
 
           <button
             type="submit"
