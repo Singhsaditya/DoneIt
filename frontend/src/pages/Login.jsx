@@ -7,17 +7,17 @@ export default function Login() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen dot-grid dot-fade-light relative overflow-hidden bg-[#f8fafc]">
+    <div className="relative min-h-screen dot-grid dot-fade-light overflow-hidden bg-[#f8fafc]">
       <ExpensoLikeBackground />
       <LoginModal open={open} onClose={() => setOpen(false)} />
 
       {/* Top bar */}
       <header className="relative z-10 flex items-center justify-between px-10 py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl
-                          bg-gradient-to-br from-[#0ea5e9] to-[#0284c7]
-                          shadow-[0_8px_24px_rgba(14,165,233,0.35)]">
-            <span className="text-lg font-bold text-white">D</span>
+          {/* SAME LOGO AS INSIDE APP */}
+          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center relative">
+            <div className="absolute inset-2 border-2 border-white rounded-full" />
+            <div className="absolute w-1.5 h-1.5 bg-white rounded-full" />
           </div>
 
           <span className="text-[22px] font-semibold tracking-tight text-[#0f172a]">
@@ -50,12 +50,6 @@ export default function Login() {
         </p>
 
         <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <Feature text="Role-based Access" />
-          <Feature text="Smart Task Assignment" />
-          <Feature text="Audit Logs & Tracking" />
-        </div>
-
-        <div className="mt-10 flex flex-wrap justify-center gap-4">
           <button
             onClick={() => setOpen(true)}
             className="rounded-xl bg-[#0ea5e9] px-8 py-4
@@ -73,15 +67,6 @@ export default function Login() {
           </Link>
         </div>
       </main>
-    </div>
-  );
-}
-
-function Feature({ text }) {
-  return (
-    <div className="rounded-full glass-card
-                    font-medium text-[#0f172a] shadow-sm border">
-      • {text}
     </div>
   );
 }
