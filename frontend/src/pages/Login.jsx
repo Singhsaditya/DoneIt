@@ -1,85 +1,87 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
-import { useAuthStore } from "../stores/authStore";
+import ExpensoLikeBackground from "../components/ExpensoLikeBackground";
+import LoginModal from "../components/LoginModal";
 
 export default function Login() {
-  const navigate = useNavigate();
-  const login = useAuthStore((s) => s.login);
-  const loading = useAuthStore((s) => s.loading);
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await login(formData);
-      navigate("/dashboard");
-    } catch (err) {
-      alert(err?.response?.data?.message || "Login failed");
-    }
-  };
+  const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md rounded-3xl p-10 shadow-xl bg-white/10 backdrop-blur-xl">
-        <h1 className="text-3xl font-bold text-center mb-6">
-          Welcome Back
-        </h1>
+    <div className="relative min-h-screen dot-grid dot-fade-light relative overflow-hidden bg-[#f8fafc]">
+      <ExpensoLikeBackground />
+      <LoginModal open={open} onClose={() => setOpen(false)} />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email address"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
-          />
-
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              required
-              className="w-full px-4 py-3 rounded-xl bg-white/70 border pr-12"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
+      {/* Top bar */}
+      <header className="relative z-10 flex items-center justify-between px-10 py-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl
+                          bg-gradient-to-br from-[#0ea5e9] to-[#0284c7]
+                          shadow-[0_8px_24px_rgba(14,165,233,0.35)]">
+            <span className="text-lg font-bold text-white">D</span>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
-          >
-            {loading ? "Signing in..." : "Login"}
-          </button>
-        </form>
+          <span className="text-[22px] font-semibold tracking-tight text-[#0f172a]">
+            Done<span className="text-[#0ea5e9] font-bold">It</span>
+          </span>
+        </div>
 
-        <p className="text-sm text-center mt-6">
-          Don’t have an account?{" "}
-          <Link to="/signup" className="underline">
-            Create account
-          </Link>
+        <button
+          className="rounded-xl bg-[#0ea5e9] px-6 py-3 text-sm font-medium
+                     text-white hover:bg-[#0284c7] transition shadow-sm"
+          onClick={() => setOpen(true)}
+        >
+          Sign in with Google
+        </button>
+      </header>
+
+      {/* Hero */}
+      <main className="relative z-10 mt-24 flex flex-col items-center px-6 text-center">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(248,250,252,0.97)_0%,rgba(248,250,252,0.9)_25%,rgba(248,250,252,0.5)_40%,rgba(248,250,252,0.0)_100%)]" />
+
+        <h1 className="max-w-4xl text-5xl font-extrabold leading-tight text-[#0f172a]">
+          Work in. Work out.
+          <br />
+          <span className="text-[#0ea5e9]">We keep teams aligned</span>
+        </h1>
+
+        <p className="mt-6 max-w-2xl text-lg text-[#475569]">
+          DoneIt helps teams plan, assign, and track work effortlessly with
+          role-based access, audit logs, and real-time task visibility.
         </p>
-      </div>
+
+        <div className="mt-10 flex flex-wrap justify-center gap-4">
+          <Feature text="Role-based Access" />
+          <Feature text="Smart Task Assignment" />
+          <Feature text="Audit Logs & Tracking" />
+        </div>
+
+        <div className="mt-10 flex flex-wrap justify-center gap-4">
+          <button
+            onClick={() => setOpen(true)}
+            className="rounded-xl bg-[#0ea5e9] px-8 py-4
+                       font-semibold text-white hover:bg-[#0284c7] transition"
+          >
+            Sign In & Start →
+          </button>
+
+          <Link
+            to="/signup"
+            className="rounded-xl border border-[#0ea5e9] px-8 py-4
+                       font-semibold text-[#0ea5e9] hover:bg-[#e0f2fe] transition"
+          >
+            Create Account
+          </Link>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function Feature({ text }) {
+  return (
+    <div className="rounded-full glass-card
+                    font-medium text-[#0f172a] shadow-sm border">
+      • {text}
     </div>
   );
 }

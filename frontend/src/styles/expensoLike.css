@@ -1,0 +1,42 @@
+.expenso-bg {
+  position: absolute;
+  inset: 0;
+  background-color: #f8fafc;
+
+  /* Diagonal square grid */
+  background-image:
+    linear-gradient(135deg, rgba(15,23,42,0.08) 1px, transparent 1px),
+    linear-gradient(45deg, rgba(15,23,42,0.08) 1px, transparent 1px),
+
+    /* Dots at intersections */
+    radial-gradient(circle, #0ea5e9 1.6px, transparent 1.7px);
+
+  /* í´¥ KEY PART â€” DENSITY */
+  background-size:
+    40px 40px,
+    40px 40px,
+    40px 40px;
+
+  background-position:
+    0 0,
+    0 0,
+    20px 20px;
+
+  animation: grid-drift 80s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes grid-drift {
+  from {
+    background-position:
+      0 0,
+      0 0,
+      20px 20px;
+  }
+  to {
+    background-position:
+      160px 160px,
+      160px 160px,
+      180px 180px;
+  }
+}

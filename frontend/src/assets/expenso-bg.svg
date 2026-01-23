@@ -1,0 +1,15 @@
+<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="60" y2="0" stroke="#0f172a" stroke-opacity="0.08" stroke-width="1"/>
+      <line x1="0" y1="0" x2="0" y2="60" stroke="#0f172a" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+
+    <pattern id="dots" width="120" height="120" patternUnits="userSpaceOnUse">
+      <circle cx="60" cy="60" r="2" fill="#0ea5e9"/>
+    </pattern>
+  </defs>
+
+  <rect width="100%" height="100%" fill="url(#grid)" />
+  <rect width="100%" height="100%" fill="url(#dots)" />
+</svg>

@@ -1,125 +1,83 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
-import { useAuthStore } from "../stores/authStore";
+import { Link } from "react-router-dom";
 
 export default function Signup() {
-  const navigate = useNavigate();
-  const signup = useAuthStore((s) => s.signup);
-  const loading = useAuthStore((s) => s.loading);
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (formData.password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    try {
-      await signup(formData);
-      navigate("/dashboard");
-    } catch (err) {
-      alert(err?.response?.data?.message || "Signup failed");
-    }
-  };
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md rounded-3xl p-10 shadow-xl bg-white/10 backdrop-blur-xl">
-        <h1 className="text-3xl font-bold text-center mb-6">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#f8fbff]">
+
+      {/* DOT GRID (FULL VISIBILITY LIKE LANDING) */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: "radial-gradient(#2fa4ff 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+          opacity: 0.5,
+        }}
+      />
+
+      {/* GLASS CARD */}
+      <div className="relative z-10 w-full max-w-md rounded-3xl bg-white/30 backdrop-blur-2xl border border-white/40 shadow-[0_25px_60px_rgba(0,120,255,0.15)] p-10">
+        <h1 className="text-3xl font-bold text-center text-slate-900 mb-8">
           Create Account
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form className="space-y-5">
           <input
             type="text"
             placeholder="Full name"
-            value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
-            required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
+            className="w-full px-5 py-3 rounded-xl bg-white/80 text-slate-900 placeholder-slate-500 border border-white focus:outline-none focus:ring-2 focus:ring-sky-400"
           />
 
           <input
             type="email"
             placeholder="Email address"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            required
-            className="w-full px-4 py-3 rounded-xl bg-white/70 border"
+            className="w-full px-5 py-3 rounded-xl bg-white/80 text-slate-900 placeholder-slate-500 border border-white focus:outline-none focus:ring-2 focus:ring-sky-400"
           />
 
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"}
+              type={showPass ? "text" : "password"}
               placeholder="Password"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              required
-              className="w-full px-4 py-3 rounded-xl bg-white/70 border pr-12"
+              className="w-full px-5 py-3 rounded-xl bg-white/80 text-slate-900 placeholder-slate-500 border border-white pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400"
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+              onClick={() => setShowPass(!showPass)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              Ì±Å
             </button>
           </div>
 
           <div className="relative">
             <input
-              type={showConfirmPassword ? "text" : "password"}
+              type={showConfirm ? "text" : "password"}
               placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-xl bg-white/70 border pr-12"
+              className="w-full px-5 py-3 rounded-xl bg-white/80 text-slate-900 placeholder-slate-500 border border-white pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400"
             />
             <button
               type="button"
-              onClick={() =>
-                setShowConfirmPassword(!showConfirmPassword)
-              }
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+              onClick={() => setShowConfirm(!showConfirm)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600"
             >
-              {showConfirmPassword ? (
-                <EyeOff size={18} />
-              ) : (
-                <Eye size={18} />
-              )}
+              Ì±Å
             </button>
           </div>
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
+            className="w-full py-3 rounded-xl bg-sky-500 text-white font-semibold text-lg hover:bg-sky-600 transition shadow-lg"
           >
-            {loading ? "Creating account..." : "Sign Up"}
+            Sign Up
           </button>
         </form>
 
-        <p className="text-sm text-center mt-6">
+        <p className="text-center text-sm text-slate-700 mt-6">
           Already have an account?{" "}
-          <Link to="/login" className="underline">
+          <Link to="/login" className="text-sky-600 font-semibold hover:underline">
             Login
           </Link>
         </p>

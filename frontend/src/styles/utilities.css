@@ -1,0 +1,53 @@
+@layer utilities {
+  .dot-grid {
+    background-image: radial-gradient(rgba(14,165,233,0.6) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .dot-fade::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(248,250,252,0.9) 0%,
+      rgba(248,250,252,0.8) 40%,
+      rgba(248,250,252,0.6) 65%,
+      rgba(248,250,252,0.2) 100%
+    );
+    pointer-events: none;
+  }
+}
+
+@layer utilities {
+  .dot-fade-light::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(248,250,252,0.75) 0%,
+      rgba(248,250,252,0.55) 35%,
+      rgba(248,250,252,0.25) 60%,
+      rgba(248,250,252,0.05) 100%
+    );
+    pointer-events: none;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,255,0.75),
+      rgba(255,255,255,0.6)
+    );
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 1.5rem;
+    box-shadow:
+      0 20px 40px rgba(0,0,0,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.35);
+  }
+}
