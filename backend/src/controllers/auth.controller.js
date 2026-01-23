@@ -1,3 +1,5 @@
+import crypto from "crypto";
+import { sendEmail } from "../utils/sendEmail.js";
 import User from "../models/user.model.js";
 import AuditLog from "../models/audit.model.js";
 import generateToken from "../utils/generateToken.js";
@@ -69,4 +71,69 @@ export const getMe = async (req, res) => {
     email: req.user.email,
     role: req.user.role,
   });
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+    await user.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Reset your DoneIt password",
+      html: `
+        <h3>Password Reset</h3>
+        <p>Click the link below to reset your password:</p>
+        <a href="${resetUrl}">${resetUrl}</a>
+        <p>This link expires in 15 minutes.</p>
+      `,
+    });
+
+    res.json({ message: "Password reset email sent" });
+  } catch (err) {
+    res.status(500).json({ message: "Forgot password failed" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    res.status(500).json({ message: "Reset password failed" });
+  }
 };
