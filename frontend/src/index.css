@@ -37,12 +37,6 @@
     position: fixed;
     inset: -40%;
     z-index: -1;
-    background:
-      radial-gradient(ellipse at 20% 30%, rgba(254, 243, 199, 0.35) 0%, transparent 55%),
-      radial-gradient(ellipse at 80% 20%, rgba(254, 215, 170, 0.25) 0%, transparent 55%),
-      radial-gradient(ellipse at 40% 70%, rgba(187, 247, 208, 0.25) 0%, transparent 55%),
-      radial-gradient(ellipse at 70% 80%, rgba(229, 231, 235, 0.35) 0%, transparent 55%),
-      radial-gradient(ellipse at 90% 50%, rgba(199, 210, 254, 0.2) 0%, transparent 55%);
     filter: blur(40px);
     pointer-events: none;
   }
@@ -95,4 +89,14 @@
 .glass-primary {
   background: rgba(14, 165, 233, 0.9); /* login blue #0ea5e9 */
   backdrop-filter: blur(10px);
+}
+
+/* Auth-only background */
+.auth-bg {
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(254, 243, 199, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(254, 215, 170, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse at 40% 70%, rgba(187, 247, 208, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 80%, rgba(229, 231, 235, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 50%, rgba(199, 210, 254, 0.2) 0%, transparent 55%);
 }

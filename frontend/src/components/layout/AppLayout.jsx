@@ -46,7 +46,7 @@ export default function AppLayout() {
         onLogout={handleLogout}
         profileRef={profileRef}
       />
-      <main className="ml-64 pt-16">
+      <main className="min-h-screen bg-[#f8fafc]" className="ml-64 pt-16">
         <div className="p-6 page-transition">
           <Outlet />
         </div>

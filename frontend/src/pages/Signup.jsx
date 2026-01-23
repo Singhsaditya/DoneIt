@@ -9,7 +9,7 @@ export default function Signup() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
-    <div className="relative min-h-screen dot-grid dot-fade-light overflow-hidden bg-[#f8fafc]">
+    <div className="relative min-h-screen auth-bg dot-grid dot-fade-light overflow-hidden bg-[#f8fafc]">
       <ExpensoLikeBackground />
 
       {/* MODAL OVERLAY (same as login) */}

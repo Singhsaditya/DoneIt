@@ -7,7 +7,7 @@ export default function Login() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen dot-grid dot-fade-light overflow-hidden bg-[#f8fafc]">
+    <div className="relative min-h-screen auth-bg dot-grid dot-fade-light overflow-hidden bg-[#f8fafc]">
       <ExpensoLikeBackground />
       <LoginModal open={open} onClose={() => setOpen(false)} />
 
