@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, LogOut, ChevronDown } from 'lucide-react';
+import { Bell, LogOut, ChevronDown, UserCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useNotificationStore } from '../../stores/notificationStore';
@@ -111,11 +111,9 @@ export default function TopBar({
               onClick={() => setProfileOpen(!profileOpen)}
               className="flex items-center gap-3 hover:bg-white/40 px-3 py-1.5 rounded-xl transition-all"
             >
-              <img
-                src={user?.avatar}
-                alt={user?.name}
-                className="w-9 h-9 rounded-full border-2 border-primary shadow-sm"
-              />
+              <div className="w-9 h-9 rounded-full bg-slate-200 border-2 border-primary shadow-sm flex items-center justify-center">
+                <UserCircle className="w-6 h-6 text-slate-600" />
+              </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-foreground">
                   {user?.name}
