@@ -55,6 +55,7 @@ function DashboardRouter() {
 }
 
 export default function App() {
+  React.useEffect(() => { if (localStorage.getItem("token") && window.location.pathname === "/signup") window.location.href = "/"; }, []);
   useHydrateAuth();
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
