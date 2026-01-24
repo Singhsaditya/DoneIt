@@ -74,40 +74,77 @@ export const getMe = async (req, res) => {
 };
 
 export const forgotPassword = async (req, res) => {
+
   try {
+
     const { email } = req.body;
 
+
+
     const user = await User.findOne({ email });
+
     if (!user) {
+
       return res.status(404).json({ message: "User not found" });
+
     }
 
+
+
     const resetToken = crypto.randomBytes(32).toString("hex");
+
     user.resetPasswordToken = crypto
+
       .createHash("sha256")
+
       .update(resetToken)
+
       .digest("hex");
+
     user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+
 
     await user.save();
 
+
+
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
+
+
     await sendEmail({
+
       to: user.email,
+
       subject: "Reset your DoneIt password",
+
       html: `
+
         <h3>Password Reset</h3>
+
         <p>Click the link below to reset your password:</p>
+
         <a href="${resetUrl}">${resetUrl}</a>
+
         <p>This link expires in 15 minutes.</p>
+
       `,
+
     });
 
+
+
     res.json({ message: "Password reset email sent" });
+
   } catch (err) {
+
+    console.error("FORGOT PASSWORD ERROR:", err);
+
     res.status(500).json({ message: "Forgot password failed" });
+
   }
+
 };
 
 export const resetPassword = async (req, res) => {
@@ -134,6 +171,7 @@ export const resetPassword = async (req, res) => {
 
     res.json({ message: "Password reset successful" });
   } catch (err) {
-    res.status(500).json({ message: "Reset password failed" });
+    console.error("FORGOT PASSWORD ERROR:", err);
+    res.status(500).json({ message: "Forgot password failed" });
   }
-};
+  }
