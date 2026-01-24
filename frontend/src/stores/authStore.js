@@ -38,6 +38,7 @@ export const useAuthStore = create((set) => ({
 
   signup: async (data) => {
     const res = await api.post("/auth/signup", data);
+    window.location.href = "/";
     localStorage.setItem("token", res.data.token);
     localStorage.setItem("user", JSON.stringify(res.data.user));
 
