@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -16,5 +17,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
