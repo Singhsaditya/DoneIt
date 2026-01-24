@@ -15,7 +15,8 @@
     "mime-types": "^2.1.35",
     "mongodb": "^5.9.0",
     "mongoose": "^7.6.3",
-    "nodemailer": "^7.0.12"
+    "nodemailer": "^7.0.12",
+    "path-to-regexp": "^0.1.7"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
